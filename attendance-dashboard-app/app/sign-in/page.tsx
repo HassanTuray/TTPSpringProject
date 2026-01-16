@@ -1,3 +1,10 @@
 export default function SignIn() {
-  return <div>Sign in page</div>;
+  return 
+  (
+    <main>
+        <section>
+
+        </section>
+    </main>
+  );
 }
