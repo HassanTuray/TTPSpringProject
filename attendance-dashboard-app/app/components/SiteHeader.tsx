@@ -1,13 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 export default function SiteHeader() {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-    const [isSignedIn, setIsSignedIn] = useState(true);
+
     const router = useRouter();
 
     const toggleDropdown = () => {
@@ -30,7 +30,7 @@ export default function SiteHeader() {
     };
 
     const handleLogout = () => {
-        setIsSignedIn(false);
+        localStorage.setItem('isSignedIn', 'false');
         router.push('/');
         setIsDropdownOpen(false);
     };
@@ -64,7 +64,7 @@ export default function SiteHeader() {
                     {/* Dropdown Menu */}
                     {isDropdownOpen && (
                         <div className="header-dropdown">
-                            {!isSignedIn ? (
+                            {!(localStorage.getItem('isSignedIn') === "true") ? (
                                 <>
                                     <button
                                         onClick={handleSignIn}
