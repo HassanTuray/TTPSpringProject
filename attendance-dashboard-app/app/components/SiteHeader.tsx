@@ -4,11 +4,31 @@ import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { createClient } from '@/lib/supabase/client';
+import type { User } from '@supabase/supabase-js';
 
 export default function SiteHeader() {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-
+    const [user, setUser] = useState<User | null>(null);
+    const [loading, setLoading] = useState(true);
     const router = useRouter();
+    const supabase = createClient();
+
+    useEffect(() => {
+        const getUser = async () => {
+            const { data: { user } } = await supabase.auth.getUser();
+            setUser(user);
+            setLoading(false);
+        };
+
+        getUser();
+
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+            setUser(session?.user ?? null);
+        });
+
+        return () => subscription.unsubscribe();
+    }, [supabase.auth]);
 
     const toggleDropdown = () => {
         setIsDropdownOpen(!isDropdownOpen);
@@ -29,10 +49,11 @@ export default function SiteHeader() {
         setIsDropdownOpen(false);
     };
 
-    const handleLogout = () => {
-        localStorage.setItem('isSignedIn', 'false');
-        router.push('/');
+    const handleLogout = async () => {
+        await supabase.auth.signOut();
         setIsDropdownOpen(false);
+        router.push('/');
+        router.refresh();
     };
 
     return (
@@ -62,9 +83,9 @@ export default function SiteHeader() {
                     </button>
 
                     {/* Dropdown Menu */}
-                    {isDropdownOpen && (
+                    {isDropdownOpen && !loading && (
                         <div className="header-dropdown">
-                            {!(localStorage.getItem('isSignedIn') === "true") ? (
+                            {!user ? (
                                 <>
                                     <button
                                         onClick={handleSignIn}
