@@ -1,17 +1,57 @@
 'use client';
 
+import { createClient } from '@/lib/supabase/client';
 import { useState, useEffect } from 'react';
 
 export default function ViewProfile() {
-  const [username, setUsername] = useState('Alex Johnson');
-  const [major, setMajor] = useState('Computer Science');
-  const [year, setYear] = useState('junior');
-  const [mainClub, setMainClub] = useState('codeblack');
+  const [username, setUsername] = useState('User');
+  const [major, setMajor] = useState('Major');
+  const [year, setYear] = useState('Year');
+  const [mainClub, setMainClub] = useState('Club');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editUsername, setEditUsername] = useState(username);
   const [editMajor, setEditMajor] = useState(major);
   const [editYear, setEditYear] = useState(year);
   const [editMainClub, setEditMainClub] = useState(mainClub);
+  const supabase = createClient();
+
+  useEffect(() => {
+    const loadProfile = async () => {
+    const data = await supabase.auth.getUser();
+    
+    const user = data.data.user;
+    
+    if (!user) {
+      setUsername('Could not get user');
+    }
+
+    const id = user?.id;
+
+    if (!id) {
+      setUsername('No ID');
+    }
+
+    const profile_response = await supabase
+      .from("user_profiles")
+      .select("*")
+      .eq("user_id", id)
+      .single();
+    
+    if (profile_response.error) {
+      setUsername(profile_response.error.message);
+      return;
+    }
+
+    setUsername(profile_response.data.username);  
+    setMajor(profile_response.data.major);
+    setYear(profile_response.data.year);
+    setMainClub(profile_response.data.main_club);
+  }
+
+  loadProfile();
+  }
+  , [supabase]);
+  
 
   const handleOpenModal = () => {
     setEditUsername(username);

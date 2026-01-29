@@ -70,6 +70,25 @@ export default function SignUp() {
         return;
       }
 
+      const num_events_attended_response = await supabase
+        .from("attendance")
+        .select("*")
+        .eq("email", email)
+      
+      const num_events_attended = num_events_attended_response.data ? num_events_attended_response.data.length : 0;
+
+      const profile_insert_response = await supabase
+        .from("user_profiles")
+        .insert(
+          {
+            username: username,
+            year: year,
+            major: major,
+            main_club: mainClub,
+            num_events_attended: num_events_attended
+          }
+        )
+
       router.push('/');
       router.refresh();
     } catch (err) {
