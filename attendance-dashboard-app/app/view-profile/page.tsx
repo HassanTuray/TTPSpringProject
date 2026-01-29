@@ -17,36 +17,32 @@ export default function ViewProfile() {
 
   useEffect(() => {
     const loadProfile = async () => {
-    const data = await supabase.auth.getUser();
-    
-    const user = data.data.user;
-    
-    if (!user) {
-      setUsername('Could not get user');
+      const data = await supabase.auth.getUser();
+      const user = data.data.user;
+      
+      if (!user) {
+        setUsername('Could not get user');
+      }
+
+      const id = user?.id;
+
+      if (!id) {
+        setUsername('No ID');
+      }
+
+      const profile_response = await supabase
+        .from("user_profiles")
+        .select("*")
+        .eq("user_id", id)
+      
+      if (profile_response.error) {
+        setUsername(profile_response.error.message);
+        return;
+      }
+
+      const profile = profile_response.data?.[0];
+      setUsername(profile_response.data.toString());
     }
-
-    const id = user?.id;
-
-    if (!id) {
-      setUsername('No ID');
-    }
-
-    const profile_response = await supabase
-      .from("user_profiles")
-      .select("*")
-      .eq("user_id", id)
-      .single();
-    
-    if (profile_response.error) {
-      setUsername(profile_response.error.message);
-      return;
-    }
-
-    setUsername(profile_response.data.username);  
-    setMajor(profile_response.data.major);
-    setYear(profile_response.data.year);
-    setMainClub(profile_response.data.main_club);
-  }
 
   loadProfile();
   }
@@ -65,13 +61,20 @@ export default function ViewProfile() {
     setIsModalOpen(false);
   };
 
-  const handleSaveProfile = () => {
-    setUsername(editUsername);
-    setMajor(editMajor);
-    setYear(editYear);
-    setMainClub(editMainClub);
-    localStorage.setItem('username', editUsername);
-    setIsModalOpen(false);
+  const handleSaveProfile = async () => {
+    const id = supabase.auth.getUser();
+
+    const response = await supabase
+      .from("user_profiles")
+      .update(
+        {
+          username: editUsername,
+          setMajor: editMajor,
+          year: editYear,
+          main_club: editMainClub
+        }
+      )
+      .eq("user_id", id);
   };
 
   const getYearLabel = (yearValue: string) => {

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { createClient } from '@/lib/supabase/client';
+import { createAdminClient, createClient } from '@/lib/supabase/client';
 
 export default function SignUp() {
   const [username, setUsername] = useState('');
@@ -73,7 +73,7 @@ export default function SignUp() {
       const num_events_attended_response = await supabase
         .from("attendance")
         .select("*")
-        .eq("email", email)
+        .eq("email", email);
       
       const num_events_attended = num_events_attended_response.data ? num_events_attended_response.data.length : 0;
 
@@ -81,13 +81,22 @@ export default function SignUp() {
         .from("user_profiles")
         .insert(
           {
+            user_id: authData.user.id,
             username: username,
             year: year,
             major: major,
             main_club: mainClub,
             num_events_attended: num_events_attended
           }
-        )
+        );
+      
+      if (profile_insert_response.error) {
+        setError(`Failed to create profile: ${profile_insert_response.error.message}`);
+        console.error('Profile insert error:', profile_insert_response.error);
+        return;
+      }
+
+      console.log(profile_insert_response)
 
       router.push('/');
       router.refresh();
