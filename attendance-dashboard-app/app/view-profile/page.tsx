@@ -8,6 +8,7 @@ export default function ViewProfile() {
   const [major, setMajor] = useState('Major');
   const [year, setYear] = useState('Year');
   const [mainClub, setMainClub] = useState('Club');
+  const [numEventsAttended, setNumEventsAttended] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editUsername, setEditUsername] = useState(username);
   const [editMajor, setEditMajor] = useState(major);
@@ -41,7 +42,11 @@ export default function ViewProfile() {
       }
 
       const profile = profile_response.data?.[0];
-      setUsername(profile_response.data.toString());
+      setUsername(profile.username);
+      setMajor(profile.major);
+      setYear(profile.year);
+      setMainClub(profile.main_club);
+      setNumEventsAttended(profile.num_events_attended);
     }
 
   loadProfile();
@@ -122,6 +127,10 @@ export default function ViewProfile() {
           <div className="profile-info-item">
             <div className="profile-info-label">Main Club</div>
             <div className="profile-info-value">{getClubLabel(mainClub)}</div>
+          </div>
+          <div className="profile-info-item">
+            <div className="profile-info-label">Events Attended</div>
+            <div className="profile-info-value">{numEventsAttended}</div>
           </div>
         </div>
       </div>

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { createAdminClient, createClient } from '@/lib/supabase/client';
+import {createClient } from '@/lib/supabase/client';
 
 export default function SignUp() {
   const [username, setUsername] = useState('');
@@ -73,7 +73,7 @@ export default function SignUp() {
       const num_events_attended_response = await supabase
         .from("attendance")
         .select("*")
-        .eq("email", email);
+        .eq("email", email.toLocaleLowerCase());
       
       const num_events_attended = num_events_attended_response.data ? num_events_attended_response.data.length : 0;
 
