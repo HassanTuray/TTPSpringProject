@@ -1,6 +1,14 @@
 // Utility functions for formatting data between database and display formats
 
 /**
+ * Converts a display string to database format (lowercase with hyphens)
+ * Example: "Computer Science" -> "computer-science"
+ */
+export function toDbFormat(str: string): string {
+  return str.toLowerCase().replace(/ /g, '-');
+}
+
+/**
  * Maps year values from database format to display format
  */
 export function getYearLabel(yearValue: string): string {
