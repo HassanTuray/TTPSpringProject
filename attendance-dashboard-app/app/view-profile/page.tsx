@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/client';
 import { useState, useEffect } from 'react';
+import { getYearLabel, getClubLabel } from '@/lib/formatters';
 
 export default function ViewProfile() {
   const [username, setUsername] = useState('User');
@@ -80,25 +81,6 @@ export default function ViewProfile() {
         }
       )
       .eq("user_id", id);
-  };
-
-  const getYearLabel = (yearValue: string) => {
-    const yearMap: { [key: string]: string } = {
-      freshman: 'Freshman',
-      sophomore: 'Sophomore',
-      junior: 'Junior',
-      senior: 'Senior',
-    };
-    return yearMap[yearValue] || yearValue;
-  };
-
-  const getClubLabel = (clubValue: string) => {
-    const clubMap: { [key: string]: string } = {
-      codeblack: 'CodeBlack',
-      colorstack: 'ColorStack',
-      'black-engineers-society': 'Black Engineers Society',
-    };
-    return clubMap[clubValue] || clubValue;
   };
 
   return (
